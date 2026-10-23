@@ -1,0 +1,102 @@
+version: 2
+
+metrics:
+  # plays
+  - name: total_plays
+    label: Total plays
+    type: simple
+    type_params:
+      measure: play_count
+
+  - name: completion_pct
+    label: Completion %
+    description: Completions divided by pass attempts.
+    type: ratio
+    type_params:
+      numerator: completions
+      denominator: pass_attempts
+
+  - name: interception_rate
+    label: Interception rate
+    description: Interceptions divided by pass attempts.
+    type: ratio
+    type_params:
+      numerator: interceptions
+      denominator: pass_attempts
+
+  - name: sack_rate
+    label: Sack rate
+    description: Sacks divided by dropbacks.
+    type: ratio
+    type_params:
+      numerator: sacks
+      denominator: dropbacks
+
+  - name: yards_per_play
+    label: Yards per play
+    type: ratio
+    type_params:
+      numerator: yards_gained
+      denominator: play_count
+
+  - name: epa_per_play
+    label: EPA per play
+    description: Expected points added per play.
+    type: ratio
+    type_params:
+      numerator: expected_points_added
+      denominator: play_count
+
+  # player stats
+  - name: passing_yards
+    label: Passing yards
+    type: simple
+    type_params:
+      measure: passing_yards
+
+  - name: passing_tds
+    label: Passing TDs
+    type: simple
+    type_params:
+      measure: passing_tds
+
+  - name: rushing_yards
+    label: Rushing yards
+    type: simple
+    type_params:
+      measure: rushing_yards
+
+  - name: receiving_yards
+    label: Receiving yards
+    type: simple
+    type_params:
+      measure: receiving_yards
+
+  - name: fantasy_points_ppr
+    label: Fantasy points (PPR)
+    type: simple
+    type_params:
+      measure: fantasy_points_ppr
+
+  - name: catch_rate
+    label: Catch rate
+    description: Receptions divided by targets.
+    type: ratio
+    type_params:
+      numerator: receptions
+      denominator: targets
+
+  # games
+  - name: games_played
+    label: Games played
+    type: simple
+    type_params:
+      measure: games_played
+
+  - name: points_per_game
+    label: Points per game
+    description: Total points scored by both teams divided by games played.
+    type: ratio
+    type_params:
+      numerator: total_points
+      denominator: games_played

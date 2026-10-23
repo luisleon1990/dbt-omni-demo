@@ -1,0 +1,158 @@
+version: 2
+
+semantic_models:
+  - name: plays
+    description: One row per Big Data Bowl play, with outcome flags and expected points added.
+    model: ref('fct_plays')
+    defaults:
+      agg_time_dimension: game_date
+    entities:
+      - name: play
+        type: primary
+        expr: play_key
+      - name: game
+        type: foreign
+        expr: nflverse_game_id
+    dimensions:
+      - name: game_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: season
+        type: categorical
+      - name: week
+        type: categorical
+      - name: pass_result
+        type: categorical
+      - name: possession_team
+        type: categorical
+      - name: defensive_team
+        type: categorical
+      - name: offense_formation
+        type: categorical
+      - name: down
+        type: categorical
+      - name: quarter
+        type: categorical
+      - name: team_coverage_type
+        type: categorical
+      - name: dropback_type
+        type: categorical
+    measures:
+      - name: play_count
+        description: Number of plays.
+        agg: count
+        expr: play_key
+      - name: pass_attempts
+        description: Completions, incompletions and interceptions. Sacks and scrambles are excluded.
+        agg: sum
+        expr: case when pass_result in ('C', 'I', 'IN') then 1 else 0 end
+      - name: completions
+        agg: sum
+        expr: case when is_complete then 1 else 0 end
+      - name: interceptions
+        agg: sum
+        expr: case when is_interception then 1 else 0 end
+      - name: sacks
+        agg: sum
+        expr: case when is_sack then 1 else 0 end
+      - name: dropbacks
+        description: Pass attempts plus sacks and scrambles.
+        agg: sum
+        expr: case when pass_result in ('C', 'I', 'IN', 'S', 'R') then 1 else 0 end
+      - name: yards_gained
+        agg: sum
+        expr: yards_gained
+      - name: expected_points_added
+        agg: sum
+        expr: expected_points_added
+
+  - name: player_week_stats
+    description: Weekly player stats for 2025, one row per player per week.
+    model: ref('fct_player_week_stats')
+    defaults:
+      agg_time_dimension: game_date
+    entities:
+      - name: player_week
+        type: primary
+        expr: player_week_key
+      - name: player
+        type: foreign
+        expr: player_id
+      - name: game
+        type: foreign
+        expr: game_id
+    dimensions:
+      - name: game_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: season
+        type: categorical
+      - name: week
+        type: categorical
+      - name: season_type
+        type: categorical
+      - name: team
+        type: categorical
+      - name: position
+        type: categorical
+      - name: position_group
+        type: categorical
+    measures:
+      - name: passing_yards
+        agg: sum
+        expr: passing_yards
+      - name: passing_tds
+        agg: sum
+        expr: passing_tds
+      - name: rushing_yards
+        agg: sum
+        expr: rushing_yards
+      - name: receiving_yards
+        agg: sum
+        expr: receiving_yards
+      - name: receptions
+        agg: sum
+        expr: receptions
+      - name: targets
+        agg: sum
+        expr: targets
+      - name: fantasy_points_ppr
+        agg: sum
+        expr: fantasy_points_ppr
+
+  - name: games
+    description: One row per NFL game.
+    model: ref('dim_games')
+    defaults:
+      agg_time_dimension: gameday
+    entities:
+      - name: game
+        type: primary
+        expr: game_key
+    dimensions:
+      - name: gameday
+        type: time
+        type_params:
+          time_granularity: day
+      - name: season
+        type: categorical
+      - name: week
+        type: categorical
+      - name: game_type
+        type: categorical
+      - name: home_team
+        type: categorical
+      - name: away_team
+        type: categorical
+      - name: is_postseason
+        type: categorical
+    measures:
+      - name: games_played
+        description: Games that have a final score.
+        agg: sum
+        expr: case when total_points is not null then 1 else 0 end
+      - name: total_points
+        agg: sum
+        expr: total_points
