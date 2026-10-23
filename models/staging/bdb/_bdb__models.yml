@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: stg_bdb__tracking_input
+    description: >
+      Big Data Bowl 2026 player tracking before the pass is thrown. One row per player per frame
+      per play. Lightly renamed from the raw table; speed, acceleration, direction and orientation
+      replace the raw single-letter columns s, a, dir and o.
+    columns:
+      - name: game_id
+        description: NFL game identifier (10-digit format). Joins to old_game_id on stg_nflverse__games.
+        data_tests:
+          - not_null
+      - name: play_id
+        description: Play identifier, unique within a game.
+        data_tests:
+          - not_null
+      - name: nfl_id
+        description: NFL player identifier. Joins to nfl_id on stg_nflverse__players.
+        data_tests:
+          - not_null
+      - name: frame_id
+        description: Frame number within the play, starting at 1.
+        data_tests:
+          - not_null
+      - name: x
+        description: Player position along the long axis of the field, in yards.
+      - name: y
+        description: Player position along the short axis of the field, in yards.
+      - name: speed
+        description: Player speed in yards per second.
+      - name: acceleration
+        description: Player acceleration in yards per second squared.
+      - name: direction
+        description: Angle of player motion, in degrees.
+      - name: orientation
+        description: Angle the player is facing, in degrees.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [game_id, play_id, nfl_id, frame_id]
+
+  - name: stg_bdb__tracking_output
+    description: >
+      Big Data Bowl 2026 player positions while the ball is in the air. One row per player per
+      frame per play. Only position is provided. Frame numbering restarts at 1 after the throw.
+    columns:
+      - name: game_id
+        data_tests:
+          - not_null
+      - name: play_id
+        data_tests:
+          - not_null
+      - name: nfl_id
+        data_tests:
+          - not_null
+      - name: frame_id
+        data_tests:
+          - not_null
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [game_id, play_id, nfl_id, frame_id]
+
+  - name: stg_bdb__plays
+    description: >
+      Big Data Bowl 2026 play context and outcomes: situation, formation, coverage, result and
+      win-probability impact. One row per play. Raw text columns that hold numbers (penalty yards,
+      expected points and win-probability added) are cast to numeric; unparseable values become null.
+    columns:
+      - name: game_id
+        description: NFL game identifier (10-digit format). Joins to old_game_id on stg_nflverse__games.
+        data_tests:
+          - not_null
+      - name: play_id
+        description: Play identifier, unique within a game.
+        data_tests:
+          - not_null
+      - name: pass_result
+        description: "Outcome of the pass: C complete, I incomplete, S sack, IN interception, R scramble."
+      - name: expected_points_added
+        description: Change in expected points caused by the play.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [game_id, play_id]

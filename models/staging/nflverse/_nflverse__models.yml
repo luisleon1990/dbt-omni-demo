@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: stg_nflverse__games
+    description: One row per NFL game, with scores, betting lines, weather, stadium and coaches.
+    columns:
+      - name: game_id
+        description: nflverse game identifier, for example 2023_01_DET_KC.
+        data_tests:
+          - unique
+          - not_null
+      - name: old_game_id
+        description: 10-digit game identifier used by the Big Data Bowl tracking data.
+        data_tests:
+          - unique
+      - name: gsis_game_id
+        description: GSIS game number. Does not match the Big Data Bowl game_id; use old_game_id for that.
+      - name: result
+        description: Home score minus away score.
+
+  - name: stg_nflverse__players
+    description: One row per NFL player in the nflverse player master list.
+    columns:
+      - name: player_id
+        description: GSIS player identifier. Matches player_id on the stats models and gsis_id on rosters.
+        data_tests:
+          - unique
+          - not_null
+      - name: nfl_id
+        description: NFL player identifier. Matches nfl_id in the Big Data Bowl tracking data.
+
+  - name: stg_nflverse__teams
+    description: One row per NFL team, including colors and logo URLs.
+    columns:
+      - name: team_abbr
+        description: Team abbreviation, for example KC.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_nflverse__rosters
+    description: >
+      Weekly rosters for the 2023, 2024 and 2025 seasons, unioned into one table. The three raw
+      tables have identical columns, so no columns are dropped or nulled.
+    columns:
+      - name: season
+        description: Season year.
+        data_tests:
+          - not_null
+      - name: gsis_id
+        description: GSIS player identifier. Joins to player_id on stg_nflverse__players.
+
+  - name: stg_nflverse__player_stats
+    description: >
+      Weekly player stats for the 2025 season. One row per player per week. Rows with a null
+      player_id (22 in the raw table) are removed.
+    columns:
+      - name: player_id
+        description: GSIS player identifier. Joins to player_id on stg_nflverse__players.
+        data_tests:
+          - not_null
+      - name: game_id
+        description: nflverse game identifier. Joins to game_id on stg_nflverse__games.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [player_id, season, week, season_type]
+
+  - name: stg_nflverse__team_stats
+    description: Weekly team stats for the 2025 season. One row per team per week.
+    columns:
+      - name: team
+        description: Team abbreviation. Joins to team_abbr on stg_nflverse__teams.
+        data_tests:
+          - not_null
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [team, season, week, season_type]

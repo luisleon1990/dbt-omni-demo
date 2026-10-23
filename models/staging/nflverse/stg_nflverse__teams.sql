@@ -1,0 +1,30 @@
+with source as (
+
+    select * from {{ source('nflverse', 'teams') }}
+
+),
+
+renamed as (
+
+    select
+        team_abbr,
+        team_name,
+        team_id,
+        team_nick,
+        team_conf,
+        team_division,
+        team_color,
+        team_color2,
+        team_color3,
+        team_color4,
+        team_logo_wikipedia,
+        team_logo_espn,
+        team_wordmark,
+        team_conference_logo,
+        team_league_logo,
+        team_logo_squared
+    from source
+
+)
+
+select * from renamed

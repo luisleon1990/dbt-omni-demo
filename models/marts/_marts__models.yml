@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: dim_teams
+    description: One row per NFL team.
+    columns:
+      - name: team_key
+        description: Primary key. Team abbreviation.
+        data_tests: [unique, not_null]
+
+  - name: dim_players
+    description: One row per NFL player. Join to tracking data on nfl_id and to stats on player_id.
+    columns:
+      - name: player_key
+        description: Primary key. GSIS player identifier.
+        data_tests: [unique, not_null]
+
+  - name: dim_games
+    description: One row per NFL game, with derived total points, winning team and a postseason flag.
+    columns:
+      - name: game_key
+        description: Primary key. nflverse game identifier.
+        data_tests: [unique, not_null]
+      - name: is_postseason
+        description: True for any game that is not a regular-season game.
+      - name: total_points
+        description: Home score plus away score. Null for games not yet played.
+      - name: winning_team
+        description: Winning team abbreviation, TIE for a tie, null if not yet played.
+
+  - name: fct_player_week_stats
+    description: Weekly player stats for 2025. One row per player per week.
+    columns:
+      - name: player_week_key
+        description: Primary key. Player, season, week and season type.
+        data_tests: [unique, not_null]
+      - name: player_id
+        description: Foreign key to dim_players.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_players')
+                field: player_key
+      - name: game_id
+        description: Foreign key to dim_games.
+
+  - name: fct_team_week_stats
+    description: Weekly team stats for 2025. One row per team per week.
+    columns:
+      - name: team_week_key
+        description: Primary key. Team, season, week and season type.
+        data_tests: [unique, not_null]
+      - name: team
+        description: Foreign key to dim_teams.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_teams')
+                field: team_key
+
+  - name: fct_plays
+    description: >
+      One row per Big Data Bowl play, with situation, formation, coverage and outcome, plus flags
+      for completion, interception and sack. Linked to dim_games through nflverse_game_id.
+    columns:
+      - name: play_key
+        description: Primary key. Game and play identifiers.
+        data_tests: [unique, not_null]
+      - name: nflverse_game_id
+        description: Foreign key to dim_games.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_games')
+                field: game_key
+      - name: is_complete
+        description: True when the pass was completed.
+      - name: is_interception
+        description: True when the pass was intercepted.
+      - name: is_sack
+        description: True when the play ended in a sack.
+
+  - name: fct_tracking
+    description: >
+      One row per player per frame per play, combining pre-throw frames (position, speed,
+      acceleration, direction, orientation) with in-air frames (position only). Built incrementally.
+      Join to dim_players on nfl_id and to fct_plays on game_id and play_id.
+    columns:
+      - name: tracking_key
+        description: Primary key. Game, play, player, phase and frame.
+        data_tests: [unique, not_null]
+      - name: tracking_phase
+        description: pre_throw for frames before the throw, in_air for frames while the ball is in the air.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['pre_throw', 'in_air']
+      - name: nfl_id
+        description: Foreign key to dim_players.nfl_id.
