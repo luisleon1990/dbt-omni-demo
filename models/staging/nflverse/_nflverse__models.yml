@@ -10,9 +10,13 @@ models:
           - unique
           - not_null
       - name: old_game_id
-        description: 10-digit game identifier used by the Big Data Bowl tracking data.
+        description: >
+          10-digit game identifier used by the Big Data Bowl tracking data. Unique for played games.
+          Unplayed future games can share a placeholder value, so the uniqueness test only covers games with a score.
         data_tests:
-          - unique
+          - unique:
+              config:
+                where: "home_score is not null"
       - name: gsis_game_id
         description: GSIS game number. Does not match the Big Data Bowl game_id; use old_game_id for that.
       - name: result
