@@ -9,9 +9,9 @@ dbt project over `PROD_SPORTS.RAW` (Big Data Bowl 2026 tracking and nflverse dat
 - `macros/generate_schema_name.sql` – in an environment whose target name is `prod`, schemas are exactly `STAGING` and `MARTS`; elsewhere they are prefixed with the developer's schema.
 
 ## dbt platform settings
-- Production environment: target name `prod`, database `LUIS_NFL_DEMO`, role `DBT_ROLE`, warehouse `COMPUTE_WH`.
+- Production environment: target name `prod`, database `LUIS_NFL_DEMO`, role `DBT_DEMO_ROLE`, warehouse `COMPUTE_WH`.
 - Deploy job: `dbt build`.
 - The project sits at the repo root, so no subdirectory is needed.
 
 ## Omni dbt environment
-Match dbt platform exactly: Default Database `LUIS_NFL_DEMO`, Target Name `prod`, Target Role `DBT_ROLE`. Default Schema is `MARTS`.
+Match dbt platform exactly: Default Database `LUIS_NFL_DEMO`, Target Name `prod`, Target Role `DBT_DEMO_ROLE`. Default Schema is `MARTS`.
