@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: bdb
+    description: Big Data Bowl 2026 player tracking data.
+    database: PROD_SPORTS
+    schema: RAW
+    tables:
+      - name: tracking_input
+        identifier: TRACKING_INPUT
+        description: Player positions before the throw.
+      - name: tracking_output
+        identifier: TRACKING_OUTPUT
+        description: Player positions while the ball is in the air.
+      - name: supplementary_data
+        identifier: SUPPLEMENTARY_DATA
+        description: Play context and outcomes.

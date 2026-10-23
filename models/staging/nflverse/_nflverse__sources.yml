@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: nflverse
+    description: Public nflverse reference and stats data.
+    database: PROD_SPORTS
+    schema: RAW
+    tables:
+      - name: games
+        identifier: NFLVERSE_GAMES
+      - name: players
+        identifier: NFLVERSE_PLAYERS
+      - name: teams
+        identifier: NFLVERSE_TEAMS
+      - name: roster_2023
+        identifier: NFLVERSE_ROSTER_2023
+      - name: roster_2024
+        identifier: NFLVERSE_ROSTER_2024
+      - name: roster_2025
+        identifier: NFLVERSE_ROSTER_2025
+      - name: player_stats_2025
+        identifier: NFLVERSE_PLAYER_STATS_2025
+        description: Weekly player stats.
+      - name: team_stats_2025
+        identifier: NFLVERSE_TEAM_STATS_2025
+        description: Weekly team stats.
