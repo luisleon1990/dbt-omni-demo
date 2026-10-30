@@ -1,12 +1,45 @@
 version: 2
 
+# Ratio metrics take other metrics (not measures) as numerator and denominator,
+# so every ratio input below has its own simple metric.
+
 metrics:
-  # plays
+  # plays (Big Data Bowl targeted passes only: no runs, sacks or scrambles)
   - name: total_plays
-    label: Total plays
+    label: Total targeted passes
     type: simple
     type_params:
       measure: play_count
+
+  - name: pass_attempts
+    label: Pass attempts
+    type: simple
+    type_params:
+      measure: pass_attempts
+
+  - name: completions
+    label: Completions
+    type: simple
+    type_params:
+      measure: completions
+
+  - name: interceptions
+    label: Interceptions
+    type: simple
+    type_params:
+      measure: interceptions
+
+  - name: yards_gained
+    label: Yards gained
+    type: simple
+    type_params:
+      measure: yards_gained
+
+  - name: expected_points_added
+    label: Expected points added
+    type: simple
+    type_params:
+      measure: expected_points_added
 
   - name: completion_pct
     label: Completion %
@@ -24,28 +57,21 @@ metrics:
       numerator: interceptions
       denominator: pass_attempts
 
-  - name: sack_rate
-    label: Sack rate
-    description: Sacks divided by dropbacks.
-    type: ratio
-    type_params:
-      numerator: sacks
-      denominator: dropbacks
-
   - name: yards_per_play
-    label: Yards per play
+    label: Yards per targeted pass
+    description: Yards gained per targeted pass. Not full-offense yards per play, because the data has no runs or sacks.
     type: ratio
     type_params:
       numerator: yards_gained
-      denominator: play_count
+      denominator: total_plays
 
   - name: epa_per_play
-    label: EPA per play
-    description: Expected points added per play.
+    label: EPA per targeted pass
+    description: Expected points added per targeted pass. Not full-offense EPA per play, because the data has no runs or sacks.
     type: ratio
     type_params:
       numerator: expected_points_added
-      denominator: play_count
+      denominator: total_plays
 
   # player stats
   - name: passing_yards
@@ -72,6 +98,18 @@ metrics:
     type_params:
       measure: receiving_yards
 
+  - name: receptions
+    label: Receptions
+    type: simple
+    type_params:
+      measure: receptions
+
+  - name: targets
+    label: Targets
+    type: simple
+    type_params:
+      measure: targets
+
   - name: fantasy_points_ppr
     label: Fantasy points (PPR)
     type: simple
@@ -92,6 +130,12 @@ metrics:
     type: simple
     type_params:
       measure: games_played
+
+  - name: total_points
+    label: Total points
+    type: simple
+    type_params:
+      measure: total_points
 
   - name: points_per_game
     label: Points per game

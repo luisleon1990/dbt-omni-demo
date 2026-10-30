@@ -40,11 +40,11 @@ semantic_models:
         type: categorical
     measures:
       - name: play_count
-        description: Number of plays.
+        description: Number of targeted pass plays. The source data has no runs, sacks or scrambles.
         agg: count
         expr: play_key
       - name: pass_attempts
-        description: Completions, incompletions and interceptions. Sacks and scrambles are excluded.
+        description: Completions, incompletions and interceptions.
         agg: sum
         expr: case when pass_result in ('C', 'I', 'IN') then 1 else 0 end
       - name: completions
@@ -53,13 +53,6 @@ semantic_models:
       - name: interceptions
         agg: sum
         expr: case when is_interception then 1 else 0 end
-      - name: sacks
-        agg: sum
-        expr: case when is_sack then 1 else 0 end
-      - name: dropbacks
-        description: Pass attempts plus sacks and scrambles.
-        agg: sum
-        expr: case when pass_result in ('C', 'I', 'IN', 'S', 'R') then 1 else 0 end
       - name: yards_gained
         agg: sum
         expr: yards_gained
