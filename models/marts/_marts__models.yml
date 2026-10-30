@@ -63,7 +63,7 @@ models:
         type: simple
         agg: sum
         expr: case when total_points is not null then 1 else 0 end
-      - name: total_points
+      - name: total_game_points
         label: Total points
         type: simple
         agg: sum
@@ -72,7 +72,7 @@ models:
         label: Points per game
         description: Total points scored by both teams divided by games played.
         type: ratio
-        numerator: total_points
+        numerator: total_game_points
         denominator: games_played
 
   - name: fct_player_week_stats
@@ -127,37 +127,37 @@ models:
       name: fct_player_week_stats
     agg_time_dimension: game_date
     metrics:
-      - name: passing_yards
+      - name: total_passing_yards
         label: Passing yards
         type: simple
         agg: sum
         expr: passing_yards
-      - name: passing_tds
+      - name: total_passing_tds
         label: Passing TDs
         type: simple
         agg: sum
         expr: passing_tds
-      - name: rushing_yards
+      - name: total_rushing_yards
         label: Rushing yards
         type: simple
         agg: sum
         expr: rushing_yards
-      - name: receiving_yards
+      - name: total_receiving_yards
         label: Receiving yards
         type: simple
         agg: sum
         expr: receiving_yards
-      - name: receptions
+      - name: total_receptions
         label: Receptions
         type: simple
         agg: sum
         expr: receptions
-      - name: targets
+      - name: total_targets
         label: Targets
         type: simple
         agg: sum
         expr: targets
-      - name: fantasy_points_ppr
+      - name: total_fantasy_points_ppr
         label: Fantasy points (PPR)
         type: simple
         agg: sum
@@ -166,8 +166,8 @@ models:
         label: Catch rate
         description: Receptions divided by targets.
         type: ratio
-        numerator: receptions
-        denominator: targets
+        numerator: total_receptions
+        denominator: total_targets
 
   - name: fct_team_week_stats
     description: Weekly team stats for 2025. One row per team per week.
@@ -259,28 +259,28 @@ models:
         type: simple
         agg: count
         expr: play_key
-      - name: pass_attempts
+      - name: total_pass_attempts
         label: Pass attempts
         description: Completions, incompletions and interceptions.
         type: simple
         agg: sum
         expr: case when pass_result in ('C', 'I', 'IN') then 1 else 0 end
-      - name: completions
+      - name: total_completions
         label: Completions
         type: simple
         agg: sum
         expr: case when is_complete then 1 else 0 end
-      - name: interceptions
+      - name: total_interceptions
         label: Interceptions
         type: simple
         agg: sum
         expr: case when is_interception then 1 else 0 end
-      - name: yards_gained
+      - name: total_yards_gained
         label: Yards gained
         type: simple
         agg: sum
         expr: yards_gained
-      - name: expected_points_added
+      - name: total_expected_points_added
         label: Expected points added
         type: simple
         agg: sum
@@ -289,25 +289,25 @@ models:
         label: Completion %
         description: Completions divided by pass attempts.
         type: ratio
-        numerator: completions
-        denominator: pass_attempts
+        numerator: total_completions
+        denominator: total_pass_attempts
       - name: interception_rate
         label: Interception rate
         description: Interceptions divided by pass attempts.
         type: ratio
-        numerator: interceptions
-        denominator: pass_attempts
+        numerator: total_interceptions
+        denominator: total_pass_attempts
       - name: yards_per_play
         label: Yards per targeted pass
         description: Yards gained per targeted pass. Not full-offense yards per play, because the data has no runs or sacks.
         type: ratio
-        numerator: yards_gained
+        numerator: total_yards_gained
         denominator: total_plays
       - name: epa_per_play
         label: EPA per targeted pass
         description: Expected points added per targeted pass. Not full-offense EPA per play, because the data has no runs or sacks.
         type: ratio
-        numerator: expected_points_added
+        numerator: total_expected_points_added
         denominator: total_plays
 
   - name: fct_tracking
