@@ -21,12 +21,59 @@ models:
       - name: game_key
         description: Primary key. nflverse game identifier.
         data_tests: [unique, not_null]
+        entity:
+          type: primary
+          name: game
       - name: is_postseason
         description: True for any game that is not a regular-season game.
+        dimension:
+          type: categorical
       - name: total_points
         description: Home score plus away score. Null for games not yet played.
       - name: winning_team
         description: Winning team abbreviation, TIE for a tie, null if not yet played.
+      - name: gameday
+        dimension:
+          type: time
+        granularity: day
+      - name: season
+        dimension:
+          type: categorical
+      - name: week
+        dimension:
+          type: categorical
+          name: game_week
+      - name: game_type
+        dimension:
+          type: categorical
+      - name: home_team
+        dimension:
+          type: categorical
+      - name: away_team
+        dimension:
+          type: categorical
+    semantic_model:
+      enabled: true
+      name: dim_games
+    agg_time_dimension: gameday
+    metrics:
+      - name: games_played
+        label: Games played
+        description: Games that have a final score.
+        type: simple
+        agg: sum
+        expr: case when total_points is not null then 1 else 0 end
+      - name: total_points
+        label: Total points
+        type: simple
+        agg: sum
+        expr: total_points
+      - name: points_per_game
+        label: Points per game
+        description: Total points scored by both teams divided by games played.
+        type: ratio
+        numerator: total_points
+        denominator: games_played
 
   - name: fct_player_week_stats
     description: Weekly player stats for 2025. One row per player per week.
@@ -34,6 +81,9 @@ models:
       - name: player_week_key
         description: Primary key. Player, season, week and season type.
         data_tests: [unique, not_null]
+        entity:
+          type: primary
+          name: player_week
       - name: player_id
         description: Foreign key to dim_players.
         data_tests:
@@ -41,8 +91,83 @@ models:
               arguments:
                 to: ref('dim_players')
                 field: player_key
+        entity:
+          type: foreign
+          name: player
       - name: game_id
         description: Foreign key to dim_games.
+        entity:
+          type: foreign
+          name: game
+      - name: game_date
+        dimension:
+          type: time
+        granularity: day
+      - name: season
+        dimension:
+          type: categorical
+      - name: week
+        dimension:
+          type: categorical
+          name: game_week
+      - name: season_type
+        dimension:
+          type: categorical
+      - name: team
+        dimension:
+          type: categorical
+      - name: position
+        dimension:
+          type: categorical
+      - name: position_group
+        dimension:
+          type: categorical
+    semantic_model:
+      enabled: true
+      name: fct_player_week_stats
+    agg_time_dimension: game_date
+    metrics:
+      - name: passing_yards
+        label: Passing yards
+        type: simple
+        agg: sum
+        expr: passing_yards
+      - name: passing_tds
+        label: Passing TDs
+        type: simple
+        agg: sum
+        expr: passing_tds
+      - name: rushing_yards
+        label: Rushing yards
+        type: simple
+        agg: sum
+        expr: rushing_yards
+      - name: receiving_yards
+        label: Receiving yards
+        type: simple
+        agg: sum
+        expr: receiving_yards
+      - name: receptions
+        label: Receptions
+        type: simple
+        agg: sum
+        expr: receptions
+      - name: targets
+        label: Targets
+        type: simple
+        agg: sum
+        expr: targets
+      - name: fantasy_points_ppr
+        label: Fantasy points (PPR)
+        type: simple
+        agg: sum
+        expr: fantasy_points_ppr
+      - name: catch_rate
+        label: Catch rate
+        description: Receptions divided by targets.
+        type: ratio
+        numerator: receptions
+        denominator: targets
 
   - name: fct_team_week_stats
     description: Weekly team stats for 2025. One row per team per week.
@@ -60,12 +185,16 @@ models:
 
   - name: fct_plays
     description: >
-      One row per Big Data Bowl play, with situation, formation, coverage and outcome, plus flags
-      for completion, interception and sack. Linked to dim_games through nflverse_game_id.
+      One row per Big Data Bowl targeted pass play, with situation, formation, coverage, outcome,
+      expected points added and flags for completion and interception. The data has no runs, sacks
+      or scrambles. Linked to dim_games through nflverse_game_id.
     columns:
       - name: play_key
         description: Primary key. Game and play identifiers.
         data_tests: [unique, not_null]
+        entity:
+          type: primary
+          name: play
       - name: nflverse_game_id
         description: Foreign key to dim_games.
         data_tests:
@@ -74,12 +203,112 @@ models:
               arguments:
                 to: ref('dim_games')
                 field: game_key
+        entity:
+          type: foreign
+          name: game
       - name: is_complete
         description: True when the pass was completed.
       - name: is_interception
         description: True when the pass was intercepted.
       - name: is_sack
-        description: True when the play ended in a sack.
+        description: True when the play ended in a sack. Always false in this data.
+      - name: game_date
+        dimension:
+          type: time
+        granularity: day
+      - name: season
+        dimension:
+          type: categorical
+      - name: week
+        dimension:
+          type: categorical
+          name: game_week
+      - name: pass_result
+        dimension:
+          type: categorical
+      - name: possession_team
+        dimension:
+          type: categorical
+      - name: defensive_team
+        dimension:
+          type: categorical
+      - name: offense_formation
+        dimension:
+          type: categorical
+      - name: down
+        dimension:
+          type: categorical
+      - name: quarter
+        dimension:
+          type: categorical
+          name: game_quarter
+      - name: team_coverage_type
+        dimension:
+          type: categorical
+      - name: dropback_type
+        dimension:
+          type: categorical
+    semantic_model:
+      enabled: true
+      name: fct_plays
+    agg_time_dimension: game_date
+    metrics:
+      - name: total_plays
+        label: Total targeted passes
+        description: Number of targeted pass plays. The source data has no runs, sacks or scrambles.
+        type: simple
+        agg: count
+        expr: play_key
+      - name: pass_attempts
+        label: Pass attempts
+        description: Completions, incompletions and interceptions.
+        type: simple
+        agg: sum
+        expr: case when pass_result in ('C', 'I', 'IN') then 1 else 0 end
+      - name: completions
+        label: Completions
+        type: simple
+        agg: sum
+        expr: case when is_complete then 1 else 0 end
+      - name: interceptions
+        label: Interceptions
+        type: simple
+        agg: sum
+        expr: case when is_interception then 1 else 0 end
+      - name: yards_gained
+        label: Yards gained
+        type: simple
+        agg: sum
+        expr: yards_gained
+      - name: expected_points_added
+        label: Expected points added
+        type: simple
+        agg: sum
+        expr: expected_points_added
+      - name: completion_pct
+        label: Completion %
+        description: Completions divided by pass attempts.
+        type: ratio
+        numerator: completions
+        denominator: pass_attempts
+      - name: interception_rate
+        label: Interception rate
+        description: Interceptions divided by pass attempts.
+        type: ratio
+        numerator: interceptions
+        denominator: pass_attempts
+      - name: yards_per_play
+        label: Yards per targeted pass
+        description: Yards gained per targeted pass. Not full-offense yards per play, because the data has no runs or sacks.
+        type: ratio
+        numerator: yards_gained
+        denominator: total_plays
+      - name: epa_per_play
+        label: EPA per targeted pass
+        description: Expected points added per targeted pass. Not full-offense EPA per play, because the data has no runs or sacks.
+        type: ratio
+        numerator: expected_points_added
+        denominator: total_plays
 
   - name: fct_tracking
     description: >

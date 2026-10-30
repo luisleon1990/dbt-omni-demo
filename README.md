@@ -4,7 +4,7 @@ dbt project over `PROD_SPORTS.RAW` (Big Data Bowl 2026 tracking and nflverse dat
 
 - `models/staging` – one model per raw table (rosters for 2023-2025 are unioned). Views in `STAGING`.
 - `models/marts` – `dim_teams`, `dim_players`, `dim_games`, `fct_player_week_stats`, `fct_team_week_stats`, `fct_plays`, `fct_tracking` (incremental). Tables in `MARTS`.
-- `models/marts/_semantic_models.yml`, `_metrics.yml` – MetricFlow semantic models (plays, player_week_stats, games) and 21 metrics (6 ratios built on simple metrics). `metricflow_time_spine` supports time queries.
+- `models/marts/_marts__models.yml` – also holds the Semantic Layer in the latest YAML spec: semantic models on `fct_plays`, `fct_player_week_stats` and `dim_games`, and 21 metrics (6 ratios built on simple metrics). `metricflow_time_spine` supports time queries.
 - `snowflake/setup.sql` – database, roles and grants. Run once before the first build.
 - `macros/generate_schema_name.sql` – in an environment whose target name is `prod`, schemas are exactly `STAGING` and `MARTS`; elsewhere they are prefixed with the developer's schema.
 
