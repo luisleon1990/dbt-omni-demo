@@ -168,6 +168,48 @@ models:
         type: ratio
         numerator: total_receptions
         denominator: total_targets
+      - name: total_passing_epa
+        label: Passing EPA
+        type: simple
+        agg: sum
+        expr: passing_epa
+      - name: total_rushing_epa
+        label: Rushing EPA
+        type: simple
+        agg: sum
+        expr: rushing_epa
+      - name: total_receiving_epa
+        label: Receiving EPA
+        type: simple
+        agg: sum
+        expr: receiving_epa
+      - name: total_passing_attempts
+        label: Passing attempts
+        description: Player pass attempts from weekly stats (2025). Not the same as total_pass_attempts, which counts Big Data Bowl targeted passes.
+        type: simple
+        agg: sum
+        expr: attempts
+      - name: total_carries
+        label: Carries
+        type: simple
+        agg: sum
+        expr: carries
+      - name: passing_epa_per_attempt
+        label: Passing EPA per attempt
+        description: Passing EPA divided by pass attempts. Sacks are not in the denominator, so this is not EPA per dropback.
+        type: ratio
+        numerator: total_passing_epa
+        denominator: total_passing_attempts
+      - name: rushing_epa_per_carry
+        label: Rushing EPA per carry
+        type: ratio
+        numerator: total_rushing_epa
+        denominator: total_carries
+      - name: receiving_epa_per_target
+        label: Receiving EPA per target
+        type: ratio
+        numerator: total_receiving_epa
+        denominator: total_targets
 
   - name: fct_team_week_stats
     description: Weekly team stats for 2025. One row per team per week.
@@ -175,6 +217,9 @@ models:
       - name: team_week_key
         description: Primary key. Team, season, week and season type.
         data_tests: [unique, not_null]
+        entity:
+          type: primary
+          name: team_week
       - name: team
         description: Foreign key to dim_teams.
         data_tests:
@@ -182,6 +227,78 @@ models:
               arguments:
                 to: ref('dim_teams')
                 field: team_key
+        dimension:
+          type: categorical
+      - name: game_id
+        description: Foreign key to dim_games.
+        entity:
+          type: foreign
+          name: game
+      - name: game_date
+        dimension:
+          type: time
+        granularity: day
+      - name: season
+        dimension:
+          type: categorical
+      - name: game_week
+        description: Week of the season. Same as week; named so it is not a reserved time keyword.
+        dimension:
+          type: categorical
+      - name: season_type
+        dimension:
+          type: categorical
+    semantic_model:
+      enabled: true
+      name: fct_team_week_stats
+    agg_time_dimension: game_date
+    metrics:
+      - name: total_team_passing_epa
+        label: Team passing EPA
+        type: simple
+        agg: sum
+        expr: passing_epa
+      - name: total_team_rushing_epa
+        label: Team rushing EPA
+        type: simple
+        agg: sum
+        expr: rushing_epa
+      - name: total_team_receiving_epa
+        label: Team receiving EPA
+        type: simple
+        agg: sum
+        expr: receiving_epa
+      - name: total_team_pass_attempts
+        label: Team pass attempts
+        type: simple
+        agg: sum
+        expr: attempts
+      - name: total_team_carries
+        label: Team carries
+        type: simple
+        agg: sum
+        expr: carries
+      - name: total_team_targets
+        label: Team targets
+        type: simple
+        agg: sum
+        expr: targets
+      - name: team_passing_epa_per_attempt
+        label: Team passing EPA per attempt
+        description: Team passing EPA divided by pass attempts. Sacks are not in the denominator, so this is not EPA per dropback.
+        type: ratio
+        numerator: total_team_passing_epa
+        denominator: total_team_pass_attempts
+      - name: team_rushing_epa_per_carry
+        label: Team rushing EPA per carry
+        type: ratio
+        numerator: total_team_rushing_epa
+        denominator: total_team_carries
+      - name: team_receiving_epa_per_target
+        label: Team receiving EPA per target
+        type: ratio
+        numerator: total_team_receiving_epa
+        denominator: total_team_targets
 
   - name: fct_plays
     description: >
