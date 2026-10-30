@@ -17,6 +17,8 @@ games as (
 select
     plays.game_id || '-' || plays.play_id as play_key,
     plays.*,
+    plays.week as game_week,
+    plays.quarter as game_quarter,
     games.nflverse_game_id,
     games.game_type,
     plays.pass_result = 'C' as is_complete,

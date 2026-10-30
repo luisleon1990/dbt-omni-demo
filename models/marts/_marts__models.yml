@@ -39,10 +39,10 @@ models:
       - name: season
         dimension:
           type: categorical
-      - name: week
+      - name: game_week
+        description: Week of the season. Same as week; named so it is not a reserved time keyword.
         dimension:
           type: categorical
-          name: game_week
       - name: game_type
         dimension:
           type: categorical
@@ -106,10 +106,10 @@ models:
       - name: season
         dimension:
           type: categorical
-      - name: week
+      - name: game_week
+        description: Week of the season. Same as week; named so it is not a reserved time keyword.
         dimension:
           type: categorical
-          name: game_week
       - name: season_type
         dimension:
           type: categorical
@@ -219,10 +219,10 @@ models:
       - name: season
         dimension:
           type: categorical
-      - name: week
+      - name: game_week
+        description: Week of the season. Same as week; named so it is not a reserved time keyword.
         dimension:
           type: categorical
-          name: game_week
       - name: pass_result
         dimension:
           type: categorical
@@ -238,10 +238,10 @@ models:
       - name: down
         dimension:
           type: categorical
-      - name: quarter
+      - name: game_quarter
+        description: Quarter of the game. Same as quarter; named so it is not a reserved time keyword.
         dimension:
           type: categorical
-          name: game_quarter
       - name: team_coverage_type
         dimension:
           type: categorical

@@ -1,6 +1,7 @@
 select
     game_id as game_key,
     *,
+    week as game_week,
     game_type <> 'REG' as is_postseason,
     home_score + away_score as total_points,
     case
