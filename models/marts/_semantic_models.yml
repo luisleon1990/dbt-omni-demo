@@ -20,8 +20,9 @@ semantic_models:
           time_granularity: day
       - name: season
         type: categorical
-      - name: week
+      - name: game_week
         type: categorical
+        expr: week
       - name: pass_result
         type: categorical
       - name: possession_team
@@ -32,8 +33,9 @@ semantic_models:
         type: categorical
       - name: down
         type: categorical
-      - name: quarter
+      - name: game_quarter
         type: categorical
+        expr: quarter
       - name: team_coverage_type
         type: categorical
       - name: dropback_type
@@ -82,8 +84,9 @@ semantic_models:
           time_granularity: day
       - name: season
         type: categorical
-      - name: week
+      - name: game_week
         type: categorical
+        expr: week
       - name: season_type
         type: categorical
       - name: team
@@ -131,8 +134,9 @@ semantic_models:
           time_granularity: day
       - name: season
         type: categorical
-      - name: week
+      - name: game_week
         type: categorical
+        expr: week
       - name: game_type
         type: categorical
       - name: home_team
